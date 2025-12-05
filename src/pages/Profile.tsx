@@ -1,19 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import Nav from '../components/Nav';
 import Toast from '../components/Toast';
-import { SAMPLE_USER, type User, RECENT_DOWNLOADS } from '../data/sampleData';
+import { type User, RECENT_DOWNLOADS } from '../data/sampleData';
 import jitProfile from '../assets/jit.webp';
+import axios from 'axios';
 
 const Profile: React.FC = () => {
-    const [user, setUser] = useState<User>(SAMPLE_USER);
+    const [user, setUser] = useState<User>({
+        name: '',
+        registerNumber: '',
+        department: '',
+        semester: 0,
+        year: '',
+        email: '',
+        phone: '',
+        photo: '',
+    });
     const [isEditing, setIsEditing] = useState(false);
     const [showToast, setShowToast] = useState(false);
 
     useEffect(() => {
-        const savedUser = localStorage.getItem('userProfile');
-        if (savedUser) {
-            setUser(JSON.parse(savedUser));
+        const fetchUserProfile = async() => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/profile`,{
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                if(response.status === 200){
+                    setUser(response.data.user);
+                    alert("User profile fetched successfully");
+                }
+                alert("Failed to fetch user profile");
+            } catch (error) {
+                alert("Failed to fetch user profile");
+            }
         }
+        fetchUserProfile();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,10 +55,22 @@ const Profile: React.FC = () => {
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async() => {
+        try {
+            const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/profile/update`, user,{
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }});
+            if(response.status === 200){
+                alert("Profile updated successfully");
+                setShowToast(true);
+            }
+        } catch (error) {
+            alert("Failed to update profile");
+        }
         localStorage.setItem('userProfile', JSON.stringify(user));
         setIsEditing(false);
-        setShowToast(true);
+        
     };
 
     return (
@@ -76,8 +111,8 @@ const Profile: React.FC = () => {
                                 <h2 className="profile-name">{user.name}</h2>
                                 <p className="profile-role">Student</p>
                                 <div className="profile-badges">
-                                    <span className="badge">IT Dept</span>
-                                    <span className="badge">Sem 7</span>
+                                    <span className="badge">{user.department}</span>
+                                    <span className="badge">{user.semester}</span>
                                 </div>
                             </div>
 

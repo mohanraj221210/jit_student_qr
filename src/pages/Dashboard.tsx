@@ -1,9 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Nav from '../components/Nav';
 import { Link } from 'react-router-dom';
-import { SAMPLE_USER, RECENT_DOWNLOADS } from '../data/sampleData';
+import { RECENT_DOWNLOADS, type User } from '../data/sampleData';
+import axios from 'axios';
 
 const Dashboard: React.FC = () => {
+    const [user, setUser] = useState<User>({
+        name: '',
+        registerNumber: '',
+        department: '',
+        semester: 0,
+        year: '',
+        email: '',
+        phone: '',
+        photo: '',
+    })
+ 
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/profile`, {
+                    headers: {
+                        authorization: `Bearer ${token}`,
+                    },
+                });
+                if(response.status == 200){
+                    setUser(response.data.user);
+                    alert("User profile fetched successfully");
+                }
+                alert("Failed to fetch user profile");
+            } catch (error) {
+                console.error('Failed to fetch user data:', error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
     return (
         <div className="page-container dashboard-page">
             <Nav />
@@ -12,9 +48,9 @@ const Dashboard: React.FC = () => {
                 <div className="dashboard-hero">
                     <div className="hero-welcome">
                         <span className="badge">Welcome Back</span>
-                        <h1>Hello, {SAMPLE_USER.name}! 👋</h1>
+                        <h1>Hello, {user.name}! 👋</h1>
                         <p className="text-muted">
-                            {SAMPLE_USER.year} • {SAMPLE_USER.department}
+                            {user.year || "3"} • {user.department || "IT"}
                         </p>
                     </div>
                 </div>

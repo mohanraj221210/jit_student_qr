@@ -2,6 +2,7 @@ export interface User {
     name: string;
     registerNumber: string;
     department: string;
+    semester: number;
     year: string;
     email: string;
     phone: string;
@@ -46,14 +47,6 @@ export interface QuestionBank {
     downloadUrl: string;
 }
 
-export const SAMPLE_USER: User = {
-    name: "Khan",
-    registerNumber: "210623205056",
-    department: "Information Technology",
-    year: "IV Year / 7th Semester",
-    email: "khan@example.com",
-    phone: "9876543210",
-};
 
 export const STAFF_DATA: Staff[] = [
     {

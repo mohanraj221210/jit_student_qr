@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 const Nav: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const token = localStorage.getItem('token');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [lastScrollY, setLastScrollY] = useState(0);
@@ -35,7 +35,7 @@ const Nav: React.FC = () => {
     const closeMenu = () => setIsMenuOpen(false);
 
     const handleLogout = () => {
-        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('token');
         navigate('/login');
     };
 
@@ -79,7 +79,7 @@ const Nav: React.FC = () => {
                     </button>
 
                     <div className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
-                        {isLoggedIn ? (
+                        {token ? (
                             <>
                                 <Link
                                     to="/dashboard"

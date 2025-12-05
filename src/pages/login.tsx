@@ -1,22 +1,32 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
+import axios from 'axios';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (username && password) {
-      localStorage.setItem('isLoggedIn', 'true');
-      setShowToast(true);
-      setTimeout(() => {
+    try {
+      const response =  await axios.post(`${API_URL}/api/login`,{ email, password });
+      if(response.status === 200){
+        const token = response.data.token;
+        localStorage.setItem('token', token);
+         setTimeout(() => {
         navigate('/dashboard');
       }, 1000);
+      }else if(response.status == 404){
+        alert("User not found");
+      }
+    } catch (error) {
+      alert("An error occurred during login");
     }
   };
 
@@ -43,14 +53,14 @@ const Login: React.FC = () => {
               <div className="input-wrapper">
                 <input
                   type="text"
-                  id="username"
+                  id="email"
                   className="input floating-input"
                   placeholder=" "
                   required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-                <label htmlFor="username">Username / Register No</label>
+                <label htmlFor="email">Email</label>
                 <span className="input-icon">👤</span>
               </div>
             </div>
@@ -90,22 +100,6 @@ const Login: React.FC = () => {
               Sign In
             </button>
           </form>
-
-          {/* <div className="login-footer">
-            <p>Don't have an account? <a href="#">Contact Admin</a></p>
-            <div className="demo-login">
-              <p className="text-small text-muted">Demo Login:</p>
-              <button
-                className="btn btn-ghost btn-sm"
-                onClick={() => {
-                  setUsername("student");
-                  setPassword("password");
-                }}
-              >
-                Auto-fill Demo
-              </button>
-            </div>
-          </div> */}
         </div>
       </div>
 

@@ -7,15 +7,15 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const navigate = useNavigate();
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const token = localStorage.getItem('token');
 
     useEffect(() => {
-        if (!isLoggedIn) {
+        if (!token) {
             navigate('/login');
         }
-    }, [isLoggedIn, navigate]);
+    }, [token, navigate]);
 
-    return isLoggedIn ? <>{children}</> : null;
+    return token ? <>{children}</> : null;
 };
 
 export default ProtectedRoute;
